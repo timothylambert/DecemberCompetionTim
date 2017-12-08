@@ -54,7 +54,6 @@ public class CodeChallenge
 		
 		
 		int[][] map = createMap(width, height, xSupplyPoint, ySupplyPoint);
-		displayMap(map, width, height);
 		map = manhattenHeuristics(map, width, height);
 		map = manhattenCalculate(map, width, height, xSupplyPoint, ySupplyPoint);
 		displayMap(map, width, height);
