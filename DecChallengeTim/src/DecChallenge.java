@@ -18,7 +18,7 @@ public class DecChallenge
 		map = mapFill(map, xSupply, ySupply, height, width);
 		map = mapCalculate(map, xSupply, ySupply, height, width);
 		displayMap(map, height, width);
-		}
+	}
 	
 	//This Method fills the map with supply points where 
 	//applicable. If there are no valid supply points, leave all as null as default,
