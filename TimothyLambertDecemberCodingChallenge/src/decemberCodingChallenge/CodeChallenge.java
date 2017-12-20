@@ -1,5 +1,6 @@
 package decemberCodingChallenge;
 
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -9,56 +10,39 @@ public class CodeChallenge
 	public static void main(String[] args)
 	{
 
+		// Initalises the scanner and a number of variables/arrays/arraylist
+
 		Scanner sc = new Scanner(System.in);
 		int width = 0;
 		int height = 0;
 		int supplyLength = 0;
 		int[] dimensionHolder = new int[2];
-		int[] xSupplyPoint = new int[1];
-		int[] ySupplyPoint = new int[1];
+		ArrayList<supplyHolder> coordList = new ArrayList<supplyHolder>();
+
+		// gets the supply length(amount of supply points) and then gets the map
+		// dimensions and returns it as a 2 size array, this is then entered into the
+		// individual height and weight variables, I could've just used 
+		// dimensionHolder[0] and [1] but I feel this makes it easier to read. 
+		// Then fill the coordList with supplypoint coords and return it
 
 		supplyLength = getSupplyLengthChoice(sc);
-		xSupplyPoint = new int[supplyLength];//
-		ySupplyPoint = new int[supplyLength];//
 		dimensionHolder = mapDimensions(sc, supplyLength);
 		width = dimensionHolder[0];
 		height = dimensionHolder[1];
+		coordList = getSupplyChoices(supplyLength, sc, width, height, coordList);
 
-		for (int i = 0; i < supplyLength; i++)
-		{
-			try
-			{
-				System.out.println("Please enter the supply coordinates");
-				System.out.println("Please enter the x coordinate");
-				xSupplyPoint[i] = Math.abs(sc.nextInt());
-				System.out.println("Please enter the y coordinate");
-				ySupplyPoint[i] = Math.abs(sc.nextInt());
-				
-				if ((xSupplyPoint[i] > width) || (ySupplyPoint[i] > height))
-				{
-					System.out.println("That location doesn't exist!");
-					System.out.println("------------------------------------------------");
-					i--;
-				}
-				
-			} 
-			catch (InputMismatchException e)
-			{
-				sc.next();
-				System.out.println("You entered an invalid input!");
-				System.out.println("------------------------------------------------");
-				i--;
-			}		
-		}
-		
-		
-		
-		int[][] map = createMap(width, height, xSupplyPoint, ySupplyPoint);
+		// create the 2d array called map and fill it using the heuristics and calculate
+		// methods, finally display the finished map and close the scanner
+
+		int[][] map = createMap(width, height, coordList);
 		map = manhattenHeuristics(map, width, height);
-		map = manhattenCalculate(map, width, height, xSupplyPoint, ySupplyPoint);
+		map = manhattenCalculate(map, width, height, coordList);
 		displayMap(map, width, height);
 		sc.close();
 	}
+
+	// This method gets the amount of supply points from the user, contains input
+	// validation as there must be at least 1 supply point for the map to function
 
 	public static int getSupplyLengthChoice(Scanner sc)
 	{
@@ -90,6 +74,11 @@ public class CodeChallenge
 		return 0;
 
 	}
+
+	// This method gets the width and height of the map as chosen by the user and
+	// returns it in a 1d int array with 2 slots (one for each value) this method
+	// also has input validation as the map has to be bigger than the max possible
+	// amount of supply points
 
 	public static int[] mapDimensions(Scanner sc, int supplyLength)
 	{
@@ -125,11 +114,55 @@ public class CodeChallenge
 		return dimensionHolder;
 	}
 
+	// Returns an ArrayList filled with supplyHolder objects which contain the x and y
+	// coords of all the supply points the user has entered, there is input
+	// validation but if the user places a supply point on an already existing point 
+	// nothing happens
+
+	public static ArrayList<supplyHolder> getSupplyChoices(int supplyLength, Scanner sc, int width, int height,
+			ArrayList<supplyHolder> coordList)
+	{
+		boolean temp = true;
+		int xSupplyPoint;
+		int ySupplyPoint;
+		for (int i = 0; i < supplyLength; i++)
+		{
+			try
+			{
+				System.out.println("Please enter the supply coordinates");
+				System.out.println("Please enter the x coordinate");
+				xSupplyPoint = (sc.nextInt());
+				System.out.println("Please enter the y coordinate");
+				ySupplyPoint = (sc.nextInt());
+				temp = true;
+
+				if ((xSupplyPoint >= width) || (ySupplyPoint >= height) || (xSupplyPoint < 0) || ySupplyPoint < 0)
+				{
+					System.out.println("That location doesn't exist!");
+					System.out.println("------------------------------------------------");
+					i--;
+					temp = false;
+				}
+				if (temp == true)
+				{
+					coordList.add(new supplyHolder(xSupplyPoint, ySupplyPoint));
+				}
+
+			} catch (InputMismatchException e)
+			{
+				sc.next();
+				System.out.println("You entered an invalid input!");
+				System.out.println("------------------------------------------------");
+				i--;
+			}
+		}
+		return coordList;
+	}
 
 	// In this method I draw the map out filling each element with 8 as a
 	// placeholder
 
-	public static int[][] createMap(int width, int height, int[] xSupplyPoint, int[] ySupplyPoint)
+	public static int[][] createMap(int width, int height, ArrayList<supplyHolder> coordList)
 	{
 
 		// creates the map 2d array with a width and height value
@@ -150,9 +183,9 @@ public class CodeChallenge
 		// iterate through the x and y coords for the supply points, adds a 0 at
 		// each index that matches in the map
 
-		for (int i = 0; i < xSupplyPoint.length; i++)
+		for (int i = 0; i < coordList.size(); i++)
 		{
-			map[ySupplyPoint[i]][xSupplyPoint[i]] = 0;
+			map[coordList.get(i).getYCoord()][coordList.get(i).getXCoord()] = 0;
 		}
 		return map;
 	}
@@ -164,8 +197,13 @@ public class CodeChallenge
 	{
 
 		// Iterates through the map and if the index contains 0 (denoting a supply
-		// point)
-		// if it does, check for adjacent grid squares, if they exist place a 1
+		// point) if it does, check for adjacent grid squares, if they exist and
+		// don't have a 0 in them, place a 1. This is computationally more efficient than 
+		// doing the main manhattenCalculate method as that one has as many operations as 
+		// there are always number of operations(n) times number of supply points(s) so 
+		// manhattenCalculate could potentally have thousands of operations depending 
+		// on the number of supplyPoints. manhattenHeuristic has a much smaller worse 
+		// case amount of operations
 
 		for (int i = 0; i < height; i++)
 		{
@@ -196,7 +234,7 @@ public class CodeChallenge
 					}
 					if (!(j + 1 >= width))
 					{
-						if (!(map[i][j + 1] == 0))	
+						if (!(map[i][j + 1] == 0))
 						{
 							map[i][j + 1] = 1;
 						}
@@ -208,34 +246,31 @@ public class CodeChallenge
 	}
 
 	// This method calculates the manhatten distance to every supply point and then
-	// will
-	// return the smallest one which will denote the closest supply point distance
+	// will return the smallest one which will denote the closest supply point distance
 
-	public static int[][] manhattenCalculate(int[][] map, int width, int height, int[] xSupplyPoint, int[] ySupplyPoint)
+	public static int[][] manhattenCalculate(int[][] map, int width, int height, ArrayList<supplyHolder> coordList)
 	{
 		int sumA;
 		int sumB;
 		int sumC;
 
+		// If the value of the coord is 8 (not a supply point or 1 away from a
+		// supply point then set sumC as max value and compare each manhatten
+		// distance and select the smallest. I set sumC as max so that it can
+		// be reset every time and then compared downwards.
+
 		for (int i = 0; i < height; i++)
 		{
 			for (int j = 0; j < width; j++)
 			{
-
-				// If the value of the coord is 8 (not a supply point or 1 away from a
-				// supply point then set sumC as max value and compare each manhatten
-				// distance and select the smallest. I set sumC as max so that it can
-				// be reset every time and then compared downwards.
-
 				if (map[i][j] == 8)
 				{
 					sumC = 2147483647;
 
-					for (int x = 0; x < xSupplyPoint.length; x++)
+					for (int x = 0; x < coordList.size(); x++)
 					{
-						sumA = Math.abs(i - ySupplyPoint[x]);
-						sumB = Math.abs(j - xSupplyPoint[x]);
-						if ((sumC) > (sumA + sumB))
+						if ((sumC) > ((sumA = Math.abs(i - coordList.get(x).getYCoord()))
+								+ (sumB = Math.abs(j - coordList.get(x).getXCoord()))))
 						{
 							sumC = (sumA + sumB);
 						}
