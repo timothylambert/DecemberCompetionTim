@@ -4,7 +4,7 @@ Java solution for the TT December coding challenge
 
 Challenge to display a 2d array as a grid and have a number of supply points (denoted by 0) and then all other elements are the distance they are from the nearest supply point.
 
-For this implimentation please:
+For this implementation please:
   - Ensure Java is installed
   - Place the .jar in your chosen directory
   - Use cd "your directory" to navigate to the .jar location
