@@ -1,4 +1,7 @@
 
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
 public class DecChallenge
 {
 
@@ -6,11 +9,60 @@ public class DecChallenge
 	{
 		//Initialise variables, please replace these with whatever values you'd like
 		
+		Scanner sc = new Scanner(System.in);
 		int height = 5;
 		int width = 5;
-		String[][] map = new String[height][width];
-		int[] xSupply = new int[] {4, 2, 0, 5};
-		int[] ySupply = new int[] {4, 1, 4, 5};
+		String[][] map;
+		int supplyLength = 1;
+		int[] xSupply = new int[1];
+		int[] ySupply = new int[1];
+		boolean passed = false;
+		
+		
+		//gets user input using a boolean while loop to keep repeating until correct details
+		//are entered
+		
+		while (passed == false)
+		{
+			try
+			{
+				System.out.println("Please enter the grid height: ");
+				height = sc.nextInt();
+				System.out.println("Please enter the grid width:  ");
+				width = sc.nextInt();
+				System.out.println("Please enter the amount of supply points you want: ");
+				supplyLength = sc.nextInt();
+				passed = true;
+			} catch (InputMismatchException e)
+			{
+				sc.next();
+				System.out.println("Invalid Input!");
+			}
+		}
+		
+		//Set the map dimensions and the amount of supply points
+		
+		map = new String[height][width];
+		xSupply = new int[supplyLength];
+		ySupply = new int[supplyLength];
+		
+		//Get supply point list from users catching invalid inputs
+		
+		for (int i = 0; i < xSupply.length; i++)
+		{
+			try 
+			{
+				System.out.println("Please enter the x Coord");
+				xSupply[i] = sc.nextInt();
+				System.out.println("Please enter the y Coord");
+				ySupply[i] = sc.nextInt();
+			} catch (InputMismatchException e)
+			{
+				sc.next();
+				System.out.println("Invalid Input!");
+				i--;
+			}
+		}
 		
 		//fills map with method mapFill and then fills it with calculated distances from
 		//mapCalculate then displays map with displayMap
@@ -18,6 +70,7 @@ public class DecChallenge
 		map = mapFill(map, xSupply, ySupply, height, width);
 		map = mapCalculate(map, xSupply, ySupply, height, width);
 		displayMap(map, height, width);
+		sc.close();
 	}
 	
 	//This Method fills the map with supply points where 
