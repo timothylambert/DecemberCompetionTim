@@ -1,4 +1,4 @@
-# DecemberCompetionTim
+# DecemberCompetitionTim
 Java solution for the TT December coding challenge
 
 
