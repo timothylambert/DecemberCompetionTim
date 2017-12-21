@@ -7,7 +7,7 @@ public class DecChallenge
 
 	public static void main(String[] args)
 	{
-		//Initialise variables, please replace these with whatever values you'd like
+		//Initialise variables
 		
 		Scanner sc = new Scanner(System.in);
 		int height = 5;
@@ -154,7 +154,7 @@ public class DecChallenge
 	}
 	
 	//This method calculates the distances from supply points that have not been 
-	//calculated using the heuristics calculation in 
+	//calculated using the heuristics calculation in mapFill
 	
 	public static String[][] mapCalculate(String[][] map, int[] xSupply,
 			int[] ySupply, int height, int width)
