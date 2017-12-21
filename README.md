@@ -25,7 +25,9 @@ With 0 being a supply point:
 
 2 1 0 1 2 3 3 
 
-Eg. With no valid supply points:
+Eg. 
+
+With no valid supply points:
 
 null null null null null null null
 
